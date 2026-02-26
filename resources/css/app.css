@@ -1,0 +1,119 @@
+/* resources/css/app.css */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+
+/* ─── Theme Tokens ───────────────────────────────────────────── */
+@theme {
+  /* Colors (RGB channel format untuk Tailwind v4 opacity modifier) */
+  --color-primary:           17 82 212;
+  --color-background-light:  246 246 248;
+  --color-background-dark:   16 22 34;
+  --color-bone-white:        255 255 255;
+  --color-deep-blue:         10 38 94;
+  --color-brand-pink:        255 238 242;
+  --color-brand-magenta:     225 29 72;
+
+  /* Fonts */
+  --font-sans:   "Plus Jakarta Sans", "Roboto", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-roboto:  "Roboto", sans-serif;
+
+  /* Animations */
+  --animate-float-slow:   float   6s  ease-in-out infinite;
+  --animate-float-medium: float   4s  ease-in-out infinite;
+  --animate-float-fast:   float   3s  ease-in-out infinite;
+
+  --animate-sss-wave-1:   sssWave1 10s linear infinite;
+  --animate-sss-wave-2:   sssWave2 14s linear infinite;
+  --animate-sss-wave-3:   sssWave3 18s linear infinite;
+
+  --animate-tilt:         tilt    10s linear infinite;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-20px); }
+}
+
+@keyframes sssWave1 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-80px); }
+}
+
+@keyframes sssWave2 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(120px); }
+}
+
+@keyframes sssWave3 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-140px); }
+}
+
+@keyframes tilt {
+  0%, 50%, 100% { transform: rotate(0deg); }
+  25%           { transform: rotate(1deg); }
+  75%           { transform: rotate(-1deg); }
+}
+
+/* ─── Global Base ────────────────────────────────────────────── */
+@layer base {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+/* ─── Components ─────────────────────────────────────────────── */
+@layer components {
+  .diagonal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+      160deg,
+      #ffeef2 0%,
+      #ffeef2 40%,
+      rgba(225, 29, 72, 0.08) 40%,
+      rgba(225, 29, 72, 0.08) 60%,
+      #ffeef2 60%
+    );
+  }
+
+  .lift-hover {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  }
+  .lift-hover:hover {
+    transform: translateY(-8px);
+    box-shadow:
+      0 20px 25px -5px  rgb(0 0 0 / 0.1),
+      0  8px 10px -6px  rgb(0 0 0 / 0.1);
+  }
+
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Utilities ──────────────────────────────────────────────── */
+@layer utilities {
+  .animation-delay-1000 {
+    animation-delay: 1s;
+  }
+
+  .motto-pop {
+    transform-origin: 50% 50%;
+  }
+}
