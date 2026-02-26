@@ -1,21 +1,18 @@
 [providers]
-# Memastikan Railway menyiapkan environment PHP dan Node.js (untuk Tailwind/Vite)
 - "php"
 - "node"
 
 [variables]
-# Nixpacks akan otomatis menginstal semua ekstensi ini tanpa perlu ditulis di phases.setup
 NIXPACKS_PHP_EXTENSIONS = 'intl,zip,gd,pdo_mysql,bcmath,curl,mbstring,xml'
+NIXPACKS_NODE_VERSION = '20'
 
 [phases.install]
-# Instal dependensi PHP dan Node.js
 cmds = [
   "composer install --no-dev --optimize-autoloader --no-interaction",
   "npm install"
 ]
 
 [phases.build]
-# Build aset tampilan dan cache konfigurasi Laravel + Filament
 cmds = [
   "npm run build",
   "php artisan config:cache",
