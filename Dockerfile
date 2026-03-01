@@ -57,3 +57,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 # 12. Buka port standar (sebagai fallback)
 EXPOSE 80
+
+CMD ["bash", "-c", "a2dismod mpm_event mpm_worker 2>/dev/null || true; rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* 2>/dev/null || true; a2enmod mpm_prefork; exec apache2-foreground"]
