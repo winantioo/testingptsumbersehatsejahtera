@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     libonig-dev \
     libpng-dev \
-    libjpeg-dev \
+    libjpeg62-turbo-dev \
     libfreetype6-dev \
     libicu-dev \
     zip
