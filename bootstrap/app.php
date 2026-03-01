@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // 👇 Tambahan WAJIB untuk menerima Proxy (Load Balancer) dari Railway 👇
+        $middleware->trustProxies(at: '*');
+
         // Pastikan class SetLocale benar-benar ada di folder App/Http/Middleware
         // Jika masih error, coba beri komentar (//) dulu pada baris di bawah ini
         $middleware->web(append: [
