@@ -15,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // 👇 Tambahan WAJIB untuk menerima Proxy (Load Balancer) dari Railway 👇
         $middleware->trustProxies(at: '*');
 
+        // 👇 Pengecualian Maintenance Mode untuk Admin Filament dan Livewire 👇
+        $middleware->preventRequestsDuringMaintenance(except: [
+            'admin*',
+            'livewire*',
+        ]);
+
         // Pastikan class SetLocale benar-benar ada di folder App/Http/Middleware
         // Jika masih error, coba beri komentar (//) dulu pada baris di bawah ini
         $middleware->web(append: [
