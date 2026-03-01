@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# 1. Install sistem dependensi
+# 1. Install sistem dependensi & Node.js (Diperbarui)
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     unzip \
@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libicu-dev \
     zip \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Konfigurasi dan install ekstensi PHP
@@ -33,8 +35,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-# 7. Install dependensi Laravel dan set permission
+# 7. Install dependensi PHP, Node.js, dan Build Vite (Diperbarui)
 RUN composer install --no-dev --optimize-autoloader
+RUN npm install
+RUN npm run build
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # 8. Perintah Runtime: Set Port Dinamis Railway & Matikan modul MPM yang bentrok
