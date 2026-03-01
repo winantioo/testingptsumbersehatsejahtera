@@ -18,13 +18,24 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // --- TAMBAHAN BARU: Memaksa HTTPS jika environment adalah production ---
+        // 1. Memaksa HTTPS jika environment adalah production
         if ($this->app->environment('production')) {
-            URL::forceScheme('https');
+            \Illuminate\Support\Facades\URL::forceScheme('https');
         }
-        // ---------------------------------------------------------------------
 
-        Gate::define('accessFilament', function ($user) {
+        // 2. Otomatis buat folder livewire-tmp jika hilang
+        $livewireTmpPath = storage_path('app/livewire-tmp');
+        if (!file_exists($livewireTmpPath)) {
+            @mkdir($livewireTmpPath, 0775, true);
+        }
+
+        // 3. FIX PERMANEN VOLUME: Buat jembatan storage otomatis tanpa terminal
+        if (!file_exists(public_path('storage'))) {
+            app('files')->link(storage_path('app/public'), public_path('storage'));
+        }
+
+        // 4. Aturan Gate Akses Filament
+        \Illuminate\Support\Facades\Gate::define('accessFilament', function ($user) {
             $allowed = array_filter(array_map('trim', explode(',', env('ADMIN_EMAILS', ''))));
             return in_array($user->email, $allowed, true);
         });
