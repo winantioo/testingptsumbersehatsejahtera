@@ -57,11 +57,4 @@ RUN php artisan config:cache \
     && php artisan view:cache
 
 # 9. CMD: migrate + storage:link + jalankan Apache
-CMD ["sh", "-c", "\
-    sed -i \"s/Listen 80/Listen ${PORT:-8080}/g\" /etc/apache2/ports.conf && \
-    sed -i \"s/:80/:${PORT:-8080}/g\" /etc/apache2/sites-available/000-default.conf && \
-    a2dismod mpm_event mpm_worker 2>/dev/null || true && \
-    a2enmod mpm_prefork && \
-    php artisan migrate --force && \
-    php artisan storage:link && \
-    apache2-foreground"]
+CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link --force && apache2-foreground"]
