@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# 1. Install sistem dependensi & Node.js (Diperbarui)
+# 1. Install sistem dependensi & Node.js
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     unzip \
@@ -20,13 +20,20 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl intl gd
 
-# 3. Aktifkan modul rewrite Apache
+# 3. Aktifkan mod_rewrite
 RUN a2enmod rewrite
 
-# 4. Ubah DocumentRoot Apache ke folder public/ Laravel
+# 4. Ubah DocumentRoot ke public/ Laravel
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# ✅ TAMBAHAN: AllowOverride agar .htaccess Laravel berfungsi
+RUN echo '<Directory /var/www/html/public>\n\
+    Options Indexes FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' >> /etc/apache2/apache2.conf
 
 # 5. Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -35,11 +42,26 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-# 7. Install dependensi PHP, Node.js, dan Build Vite (Diperbarui)
+# 7. Install dependencies & build
 RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 8. Perintah Runtime: Set Port Dinamis Railway & Matikan modul MPM yang bentrok
-CMD ["sh", "-c", "sed -i \"s/Listen 80/Listen ${PORT:-8080}/g\" /etc/apache2/ports.conf && sed -i \"s/:80/:${PORT:-8080}/g\" /etc/apache2/sites-available/000-default.conf && a2dismod mpm_event mpm_worker 2>/dev/null || true && a2enmod mpm_prefork && apache2-foreground"]
+# 8. Permission storage
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# ✅ TAMBAHAN: Cache Laravel saat build
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+# 9. CMD: migrate + storage:link + jalankan Apache
+CMD ["sh", "-c", "\
+    sed -i \"s/Listen 80/Listen ${PORT:-8080}/g\" /etc/apache2/ports.conf && \
+    sed -i \"s/:80/:${PORT:-8080}/g\" /etc/apache2/sites-available/000-default.conf && \
+    a2dismod mpm_event mpm_worker 2>/dev/null || true && \
+    a2enmod mpm_prefork && \
+    php artisan migrate --force && \
+    php artisan storage:link && \
+    apache2-foreground"]
