@@ -60,4 +60,13 @@ RUN php artisan config:cache \
     && php artisan view:cache
 
 # 9. CMD: migrate + storage:link + jalankan Apache
-CMD ["sh", "-c", "php artisan migrate --force && php artisan storage:link --force && apache2-foreground"]
+CMD ["sh", "-c", "\
+    rm -f /etc/apache2/mods-enabled/mpm_event.conf \
+    /etc/apache2/mods-enabled/mpm_event.load \
+    /etc/apache2/mods-enabled/mpm_worker.conf \
+    /etc/apache2/mods-enabled/mpm_worker.load && \
+    ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf && \
+    ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load && \
+    php artisan migrate --force && \
+    php artisan storage:link --force && \
+    apache2-foreground"]
