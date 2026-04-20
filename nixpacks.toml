@@ -1,5 +1,6 @@
 [start]
-cmd = "php artisan migrate --force && php artisan storage:link && php -S 0.0.0.0:$PORT -t public"
+cmd = "php artisan migrate --force && php artisan storage:link && cp apache-railway.conf /etc/apache2/sites-enabled/000-default.conf && apache2-foreground"
+
 [providers]
 - "php"
 - "node"
