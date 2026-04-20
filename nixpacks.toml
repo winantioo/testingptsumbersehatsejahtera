@@ -1,6 +1,3 @@
-[start]
-cmd = "php artisan migrate --force && php artisan storage:link && cp apache-railway.conf /etc/apache2/sites-enabled/000-default.conf && apache2-foreground"
-
 [providers]
 - "php"
 - "node"
@@ -23,3 +20,6 @@ cmds = [
   "php artisan view:cache",
   "php artisan filament:optimize"
 ]
+
+[start]
+cmd = "php artisan migrate --force && php artisan storage:link && sed -i \"s/80/$PORT/g\" /etc/apache2/ports.conf && sed -i \"s/:80/:$PORT/g\" /etc/apache2/sites-enabled/000-default.conf && sed -i \"s|DocumentRoot /var/www/html|DocumentRoot /app/public|g\" /etc/apache2/sites-enabled/000-default.conf && echo '<Directory /app/public>\\n  AllowOverride All\\n  Require all granted\\n</Directory>' >> /etc/apache2/apache2.conf && apache2-foreground"
